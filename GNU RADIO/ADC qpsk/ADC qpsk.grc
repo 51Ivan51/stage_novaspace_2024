@@ -1,0 +1,929 @@
+options:
+  parameters:
+    author: IvanB
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: untitled
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: Vpp
+  id: variable
+  parameters:
+    comment: ''
+    value: '2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [408, 40.0]
+    rotation: 0
+    state: enabled
+- name: beta
+  id: variable
+  parameters:
+    comment: ''
+    value: '0.2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [600, 128.0]
+    rotation: 0
+    state: enabled
+- name: cutoff_freq
+  id: variable
+  parameters:
+    comment: ''
+    value: '600'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1024, 40.0]
+    rotation: 0
+    state: enabled
+- name: enob
+  id: variable
+  parameters:
+    comment: ''
+    value: '3'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [520, 40.0]
+    rotation: 0
+    state: enabled
+- name: fp
+  id: variable
+  parameters:
+    comment: ''
+    value: fs/10
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [736, 128.0]
+    rotation: 0
+    state: enabled
+- name: fs
+  id: variable
+  parameters:
+    comment: ''
+    value: '8000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [288, 40.0]
+    rotation: 0
+    state: enabled
+- name: n_samples
+  id: variable
+  parameters:
+    comment: ''
+    value: fs*time
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [896, 40.0]
+    rotation: 0
+    state: enabled
+- name: noise
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: ''
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '0'
+    step: '0.001'
+    stop: '0.5'
+    value: '0.1'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [656, 556.0]
+    rotation: 0
+    state: enabled
+- name: qpsk
+  id: variable
+  parameters:
+    comment: ''
+    value: '[-1-1j,+1-1j,1+1j,-1+1j]'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [584, 224.0]
+    rotation: 0
+    state: enabled
+- name: samples_per_symbol
+  id: variable
+  parameters:
+    comment: ''
+    value: '20'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [408, 128.0]
+    rotation: 0
+    state: enabled
+- name: syms
+  id: variable
+  parameters:
+    comment: ''
+    value: '10'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [312, 136.0]
+    rotation: 0
+    state: enabled
+- name: time
+  id: variable
+  parameters:
+    comment: ''
+    value: '0.5'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [776, 40.0]
+    rotation: 0
+    state: enabled
+- name: upsampling
+  id: variable
+  parameters:
+    comment: ''
+    value: '64'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [624, 40.0]
+    rotation: 0
+    state: enabled
+- name: analog_noise_source_x_0
+  id: analog_noise_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: noise
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    noise_type: analog.GR_GAUSSIAN
+    seed: '0'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [656, 428.0]
+    rotation: 0
+    state: enabled
+- name: analog_random_source_x_0
+  id: analog_random_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    max: '255'
+    maxoutbuf: '0'
+    min: '0'
+    minoutbuf: '0'
+    num_samps: '1000'
+    repeat: 'True'
+    type: byte
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 268.0]
+    rotation: 0
+    state: enabled
+- name: blocks_add_xx_0
+  id: blocks_add_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [952, 344.0]
+    rotation: 0
+    state: enabled
+- name: blocks_complex_to_real_0
+  id: blocks_complex_to_real
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 544.0]
+    rotation: 0
+    state: enabled
+- name: blocks_packed_to_unpacked_xx_0
+  id: blocks_packed_to_unpacked_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    bits_per_chunk: '2'
+    comment: ''
+    endianness: gr.GR_MSB_FIRST
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    type: byte
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [224, 288.0]
+    rotation: 0
+    state: enabled
+- name: blocks_repeat_0
+  id: blocks_repeat
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    interp: upsampling
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 688.0]
+    rotation: 0
+    state: enabled
+- name: blocks_throttle2_0
+  id: blocks_throttle2
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    ignoretag: 'True'
+    limit: auto
+    maximum: '0.1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_second: fs
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1400, 968.0]
+    rotation: 0
+    state: disabled
+- name: digital_chunks_to_symbols_xx_0
+  id: digital_chunks_to_symbols_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    dimension: '1'
+    in_type: byte
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_ports: '1'
+    out_type: complex
+    symbol_table: qpsk
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [584, 304.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    P: samples_per_symbol
+    _source_code: "import numpy as np\nfrom gnuradio import gr\nfrom scipy import\
+      \ signal\n\n\nclass blk(gr.sync_block):  # other base classes are basic_block,\
+      \ decim_block, interp_block\n    \"\"\"Convolve Block\"\"\"\n\n    def __init__(self,\
+      \ syms=10, beta=0.2, P=20):  # only default arguments here\n        \"\"\"Arguments\
+      \ to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='Convolve',  # will show up in GRC\n  \
+      \          in_sig=[np.complex64],\n            out_sig=[np.complex64]\n    \
+      \    )\n        self.syms = syms\n        self.beta = beta\n        self.P =\
+      \ P\n\n    def root_raised_cos(self):\n        k = np.arange(-self.syms * self.P\
+      \ + 1e-8, (self.syms * self.P + 1e-8) + 1)\n        s = (np.sin(np.pi * (1 -\
+      \ self.beta) * k / self.P) +\n             4 * self.beta * k / self.P * np.cos(np.pi\
+      \ * k / self.P * (1 + self.beta))) / \\\n            (np.pi * k / self.P * (1\
+      \ - 16 * (self.beta**2) * (k / self.P)**2))\n        s = s / np.sqrt(np.sum(np.abs(s)**2))\n\
+      \        return s\n\n    def work(self, input_items, output_items):\n      \
+      \  h_rrc = self.root_raised_cos()\n        signal_qpsk = signal.convolve(input_items[0],\
+      \ h_rrc, mode='same')\n        output_items[0][:] = signal_qpsk\n        return\
+      \ len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    beta: beta
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    syms: syms
+  states:
+    _io_cache: ('Convolve', 'blk', [('syms', '10'), ('beta', '0.2'), ('P', '20')],
+      [('0', 'complex', 1)], [('0', 'complex', 1)], 'Convolve Block', ['P', 'beta',
+      'syms'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1088, 332.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0_0
+  id: epy_block
+  parameters:
+    Vpp: Vpp
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\
+      \  \n    \"\"\"ADC Delta Sigma Block\"\"\"\n\n    def __init__(self, Vpp=2,\
+      \ enob=3, upsampling=64):  # only default arguments here\n        \"\"\"arguments\
+      \ to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='ADC delta sigma qpsk',   # will show up\
+      \ in GRC\n            in_sig=[np.float32],\n            out_sig=[np.float32]\n\
+      \        )\n        self.Vpp = Vpp\n        self.enob = enob\n        self.upsampling\
+      \ = upsampling\n\n    def ADC_Delta_Sigma(self, signal_in):\n        signal_feedback\
+      \ = np.zeros(len(signal_in))\n        signal_integrator = np.zeros(len(signal_in))\n\
+      \        signal_out = np.zeros(len(signal_in))\n        \n        # Loop\n \
+      \       for i in np.arange(0, len(signal_in)):\n            # Delta\n      \
+      \      if i == 0:\n                signal_feedback[i] = signal_in[i]\n     \
+      \       else:\n                signal_feedback[i] = signal_in[i] - signal_out[i-1]\n\
+      \            \n            # Int\xE9grateur\n            if i == 0:\n      \
+      \          signal_integrator[i] = signal_feedback[i]\n            else:\n  \
+      \              signal_integrator[i] = signal_feedback[i] + signal_integrator[i-1]\n\
+      \n            signal_integrator[i] = self.Vpp / (2**self.enob) * np.round(signal_integrator[i]\
+      \ / (self.Vpp / (2**self.enob)))\n        \n            # Comparateur\n    \
+      \        if signal_integrator[i] >= 0:\n                signal_out[i] = self.Vpp\
+      \ / 2\n            else:\n                signal_out[i] = -self.Vpp / 2\n  \
+      \              \n        return signal_out\n\n    def work(self, input_items,\
+      \ output_items):\n        signal_in = input_items[0]\n        signal_out = self.ADC_Delta_Sigma(signal_in)\n\
+      \        output_items[0][:] = signal_out\n        return len(output_items[0])"
+    affinity: ''
+    alias: ''
+    comment: ''
+    enob: enob
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    upsampling: upsampling
+  states:
+    _io_cache: ('ADC delta sigma qpsk', 'blk', [('Vpp', '2'), ('enob', '3'), ('upsampling',
+      '64')], [('0', 'float', 1)], [('0', 'float', 1)], 'ADC Delta Sigma Block', ['Vpp',
+      'enob', 'upsampling'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1008, 796.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_1
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ fs=8000, frequency=800):  # only default arguments here\n        \"\"\"arguments\
+      \ to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='Frequency offset',   # will show up in\
+      \ GRC\n            in_sig=[np.complex64],\n            out_sig=[np.complex64]\n\
+      \        )\n        self.fs = fs\n        self.frequency = frequency\n\n   \
+      \ def frequency_offset(self, signal_in):\n        time = np.arange(0, signal_in.size)\
+      \ / self.fs\n        signal_LO = np.exp(1j * 2 * np.pi * self.frequency * time)\n\
+      \        return signal_in * signal_LO\n\n    def work(self, input_items, output_items):\n\
+      \        output_items[0][:] = self.frequency_offset(input_items[0])\n      \
+      \  return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    frequency: fp
+    fs: fs
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('Frequency offset', 'blk', [('fs', '8000'), ('frequency', '800')],
+      [('0', 'complex', 1)], [('0', 'complex', 1)], 'Embedded Python Block example
+      - a simple multiply const', ['frequency', 'fs'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1264, 344.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_1_0
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ fs=8000, frequency=800):  # only default arguments here\n        \"\"\"arguments\
+      \ to this function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='Frequency offset',   # will show up in\
+      \ GRC\n            in_sig=[np.complex64],\n            out_sig=[np.complex64]\n\
+      \        )\n        self.fs = fs\n        self.frequency = frequency\n\n   \
+      \ def frequency_offset(self, signal_in):\n        time = np.arange(0, signal_in.size)\
+      \ / self.fs\n        signal_LO = np.exp(1j * 2 * np.pi * self.frequency * time)\n\
+      \        return signal_in * signal_LO\n\n    def work(self, input_items, output_items):\n\
+      \        output_items[0][:] = self.frequency_offset(input_items[0])\n      \
+      \  return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    frequency: -fp
+    fs: fs
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('Frequency offset', 'blk', [('fs', '8000'), ('frequency', '800')],
+      [('0', 'complex', 1)], [('0', 'complex', 1)], 'Embedded Python Block example
+      - a simple multiply const', ['frequency', 'fs'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1792, 408.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_2
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\nfrom scipy import\
+      \ signal\n\nclass blk(gr.sync_block):  # other base classes are basic_block,\
+      \ decim_block, interp_block\n    \"\"\"Embedded Python Block example - a simple\
+      \ lowpass filter\"\"\"\n\n    def __init__(self, fs=8000, cutoff_freq=600, upsampling\
+      \ = 64):  # only default arguments here\n        \"\"\"arguments to this function\
+      \ show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n    \
+      \        self,\n            name='low pass filter + decimation',   # will show\
+      \ up in GRC\n            in_sig=[np.complex64],\n            out_sig=[np.complex64]\n\
+      \        )\n        # if an attribute with the same name as a parameter is found,\n\
+      \        # a callback is registered (properties work, too).\n        self.fs\
+      \ = fs\n        self.cutoff_freq = cutoff_freq\n        self.upsampling = upsampling\n\
+      \n    def lowpass_filter(self, signal_in):\n        nyquist = self.fs / 2\n\
+      \        normal_cutoff = self.cutoff_freq / nyquist\n        nb_coeff = 101\n\
+      \        coeff_FIR = signal.firwin(nb_coeff, normal_cutoff, window='hamming')\n\
+      \        filtered_signal = signal.convolve(signal_in, coeff_FIR, mode='same')\n\
+      \        return filtered_signal\n\n    def work(self, input_items, output_items):\n\
+      \n        signal_filtered = self.lowpass_filter(input_items[0])\n\n        output_items[0][:]\
+      \ = signal.decimate(signal_filtered,upsampling,ftype ='fir')\n\n        return\
+      \ len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    cutoff_freq: cutoff_freq
+    fs: fs
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    upsampling: upsampling
+  states:
+    _io_cache: ('low pass filter + decimation', 'blk', [('fs', '8000'), ('cutoff_freq',
+      '600'), ('upsampling', '64')], [('0', 'complex', 1)], [('0', 'complex', 1)],
+      'Embedded Python Block example - a simple lowpass filter', ['cutoff_freq', 'fs',
+      'upsampling'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1384, 1228.0]
+    rotation: 0
+    state: disabled
+- name: epy_block_3
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\nfrom scipy import signal\n\n\nclass blk(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self):\
+      \  # only default arguments here\n        \"\"\"arguments to this function show\
+      \ up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n         \
+      \   self,\n            name='hilbert own',   # will show up in GRC\n       \
+      \     in_sig=[np.float32],\n            out_sig=[np.complex64]\n        )\n\n\
+      \    def work(self, input_items, output_items):\n        output_items[0][:]\
+      \ = signal.hilbert(input_items[0])\n        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('hilbert own', 'blk', [], [('0', 'float', 1)], [('0', 'complex', 1)],
+      'Embedded Python Block example - a simple multiply const', [])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1296, 824.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_4
+  id: epy_block
+  parameters:
+    P: samples_per_symbol
+    _source_code: "import numpy as np\nfrom gnuradio import gr\nfrom scipy import\
+      \ signal\n\nclass QPSKDemodulator(gr.sync_block):\n    \"\"\"QPSK Demodulation\
+      \ Block\"\"\"\n\n    def __init__(self, syms=10, beta=0.2, P=20, nb_symbols=4000):\n\
+      \        \"\"\"Constructor for QPSK Demodulation Block\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='QPSK Demodulator',  # Block name displayed\
+      \ in GRC\n            in_sig=[np.complex64],     # Input signal type (complex64)\n\
+      \            out_sig=[np.complex64]     # Output signal type (complex64)\n \
+      \       )\n        self.syms = syms      # Number of symbols\n        self.beta\
+      \ = beta      # Roll-off factor of RRC filter\n        self.P = P          \
+      \  # Oversampling factor\n        self.nb_symbols = nb_symbols  # Number of\
+      \ QPSK symbols\n\n    def root_raised_cos(self):\n        k = np.arange(-self.syms\
+      \ * self.P, self.syms * self.P + 1e-8)\n        s = (np.sin(np.pi * (1 - self.beta)\
+      \ * k / self.P) +\n             4 * self.beta * k / self.P * np.cos(np.pi *\
+      \ k / self.P * (1 + self.beta))) / \\\n            (np.pi * k / self.P * (1\
+      \ - 16 * (self.beta**2) * (k / self.P)**2))\n        s = s / np.sqrt(np.sum(np.abs(s)**2))\n\
+      \        return s\n\n    def qpsk(self):\n        h_rrc = self.root_raised_cos()\n\
+      \        symbols = np.random.randint(4, size=self.nb_symbols)\n        signal_raw\
+      \ = np.repeat(np.exp(1j * np.pi * (symbols / 2 + 1/4)), self.P)\n        delay\
+      \ = (len(h_rrc) - 1) // 2\n        signal_qpsk = signal.convolve(signal_raw,\
+      \ h_rrc, mode='same')\n        return signal_qpsk, delay\n\n    def work(self,\
+      \ input_items, output_items):\n        h_rrc = self.root_raised_cos()\n    \
+      \    h_rrc_inv = np.flipud(h_rrc)\n        demod_convolv = signal.convolve(input_items[0],\
+      \ h_rrc_inv, mode='same')\n        symbols_out_demod = demod_convolv[0::self.P]\n\
+      \n        output_items[0][:] = symbols_out_demod\n        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    beta: beta
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nb_symbols: n_samples
+    syms: syms
+  states:
+    _io_cache: ('QPSK Demodulator', 'QPSKDemodulator', [('syms', '10'), ('beta', '0.2'),
+      ('P', '20'), ('nb_symbols', '4000')], [('0', 'complex', 1)], [('0', 'complex',
+      1)], 'QPSK Demodulation Block', ['P', 'beta', 'nb_symbols', 'syms'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1808, 852.0]
+    rotation: 0
+    state: enabled
+- name: filter_fft_low_pass_filter_0
+  id: filter_fft_low_pass_filter
+  parameters:
+    affinity: ''
+    alias: ''
+    beta: '6.76'
+    comment: ''
+    cutoff_freq: cutoff_freq
+    decim: upsampling
+    gain: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nthreads: '1'
+    samp_rate: fs
+    type: ccc
+    width: '1'
+    win: window.WIN_HAMMING
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1544, 720.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_const_sink_x_0
+  id: qtgui_const_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    grid: 'False'
+    gui_hint: ''
+    label1: ''
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    marker1: '0'
+    marker10: '0'
+    marker2: '0'
+    marker3: '0'
+    marker4: '0'
+    marker5: '0'
+    marker6: '0'
+    marker7: '0'
+    marker8: '0'
+    marker9: '0'
+    name: '"Constellation before adc"'
+    nconnections: '1'
+    size: '1024'
+    style1: '0'
+    style10: '0'
+    style2: '0'
+    style3: '0'
+    style4: '0'
+    style5: '0'
+    style6: '0'
+    style7: '0'
+    style8: '0'
+    style9: '0'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: complex
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    xmax: '2'
+    xmin: '-2'
+    ymax: '2'
+    ymin: '-2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [960, 160.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_const_sink_x_0_0
+  id: qtgui_const_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    grid: 'False'
+    gui_hint: ''
+    label1: ''
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    legend: 'True'
+    marker1: '0'
+    marker10: '0'
+    marker2: '0'
+    marker3: '0'
+    marker4: '0'
+    marker5: '0'
+    marker6: '0'
+    marker7: '0'
+    marker8: '0'
+    marker9: '0'
+    name: '"Constellation after adc"'
+    nconnections: '1'
+    size: '1024'
+    style1: '0'
+    style10: '0'
+    style2: '0'
+    style3: '0'
+    style4: '0'
+    style5: '0'
+    style6: '0'
+    style7: '0'
+    style8: '0'
+    style9: '0'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: complex
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    xmax: '2'
+    xmin: '-2'
+    ymax: '2'
+    ymin: '-2'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [2032, 748.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_freq_sink_x_0
+  id: qtgui_freq_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    average: '1.0'
+    axislabels: 'True'
+    bw: fs
+    color1: '"blue"'
+    color10: '"dark blue"'
+    color2: '"red"'
+    color3: '"green"'
+    color4: '"black"'
+    color5: '"cyan"'
+    color6: '"magenta"'
+    color7: '"yellow"'
+    color8: '"dark red"'
+    color9: '"dark green"'
+    comment: ''
+    ctrlpanel: 'False'
+    fc: '0'
+    fftsize: '1024'
+    freqhalf: 'True'
+    grid: 'False'
+    gui_hint: ''
+    label: Relative Gain
+    label1: ''
+    label10: ''''''
+    label2: ''''''
+    label3: ''''''
+    label4: ''''''
+    label5: ''''''
+    label6: ''''''
+    label7: ''''''
+    label8: ''''''
+    label9: ''''''
+    legend: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    nconnections: '1'
+    norm_window: 'False'
+    showports: 'False'
+    tr_chan: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_tag: '""'
+    type: complex
+    units: dB
+    update_time: '0.10'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    wintype: window.WIN_BLACKMAN_hARRIS
+    ymax: '10'
+    ymin: '-140'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1552, 228.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_noise_source_x_0, '0', blocks_add_xx_0, '1']
+- [analog_random_source_x_0, '0', blocks_packed_to_unpacked_xx_0, '0']
+- [blocks_add_xx_0, '0', epy_block_0, '0']
+- [blocks_add_xx_0, '0', qtgui_const_sink_x_0, '0']
+- [blocks_complex_to_real_0, '0', blocks_repeat_0, '0']
+- [blocks_packed_to_unpacked_xx_0, '0', digital_chunks_to_symbols_xx_0, '0']
+- [blocks_repeat_0, '0', epy_block_0_0, '0']
+- [blocks_throttle2_0, '0', filter_fft_low_pass_filter_0, '0']
+- [digital_chunks_to_symbols_xx_0, '0', blocks_add_xx_0, '0']
+- [epy_block_0, '0', epy_block_1, '0']
+- [epy_block_0_0, '0', epy_block_3, '0']
+- [epy_block_1, '0', blocks_complex_to_real_0, '0']
+- [epy_block_1, '0', qtgui_freq_sink_x_0, '0']
+- [epy_block_1_0, '0', epy_block_4, '0']
+- [epy_block_3, '0', blocks_throttle2_0, '0']
+- [epy_block_3, '0', filter_fft_low_pass_filter_0, '0']
+- [epy_block_4, '0', qtgui_const_sink_x_0_0, '0']
+- [filter_fft_low_pass_filter_0, '0', epy_block_1_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.10.0

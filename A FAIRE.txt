@@ -1,0 +1,9 @@
+Samples_per_symbol = 10 pour large bande. Tracer la QPSK pour un angle de 50° avec du wrapping de phase.
+Regarder QPSK temporelle et phase, censé merdé pour la phase.
+
+distance terre-satelite : 1200km
+
+SIGNAL -> ADC -> BFN (phase or time delay, coordonnée theta et phi) -> GRD (coordonnée UV) -> Somme de tout les signaux -> Constelations QPSK
+
+ajuster le factor scaling dans le w 
+

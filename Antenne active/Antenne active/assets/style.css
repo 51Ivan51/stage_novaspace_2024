@@ -1,0 +1,67 @@
+/* General page styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #eaeaea; /* Couleur de fond générale plus claire */
+}
+
+/* Style for the main container */
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* Style for the graph area */
+.graph-container {
+    width: 66%;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #ffffff; /* Couleur de fond pour le graphique */
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* Ombre plus prononcée */
+    padding: 20px; /* Espacement interne */
+}
+
+/* Style for the control panel */
+.control-panel {
+    width: 33%;
+    display: inline-block;
+    vertical-align: top;
+    padding: 20px;
+    background-color: #f7f7f7; /* Couleur de fond pour le panneau de contrôle */
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2); /* Ombre plus prononcée */
+}
+
+/* Style for labels and sliders */
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333; /* Couleur du texte des labels */
+}
+
+.dcc-slider {
+    margin-bottom: 20px;
+}
+
+/* Style for variable info */
+.variable-info {
+    margin-top: 20px;
+}
+
+/* Additional styling for headers and paragraphs */
+h1 {
+    color: #333; /* Couleur du titre */
+}
+
+h3 {
+    color: #555; /* Couleur des sous-titres */
+}
+
+p {
+    color: #666; /* Couleur du texte des paragraphes */
+}
