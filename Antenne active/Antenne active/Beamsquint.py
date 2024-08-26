@@ -25,7 +25,7 @@ fs = 60e9                                               # Fréquence d'échantil
 time = 0.0000002                                        # Durée du signal
 n_samples = round(fs*time)                              # Nombre d'échantillons
 cutoff_freq = 200                                       # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 10                                 # Nombre d'échantillons par symbole
+samples_per_symbol = 10                               # Nombre d'échantillons par symbole
 c = 299792458                                           # Vitesse lumière dans le vide
 lambda0 = c / (fs/10)                                   # Longueur d'onde    
 t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
@@ -179,6 +179,7 @@ fft_phased = np.fft.fft(signaux[:,1,1])
 
 
 
+
 ## GRD
 
 nbMappingSample = 201  
@@ -243,15 +244,51 @@ plt.show()
 
 
 
+
+
+
+
 ## Somme des signaux
 
 
+max_index = np.argmax(GRD_resultant_abs)
+k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
+
+for i in range(N):
+    for j in range(N):
+        signaux[:,i,j] = signaux[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
+
+
+somme_signaux = np.zeros(n_samples*samples_per_symbol)
+
+for i in range(N):
+    for j in range(N):
+        somme_signaux = somme_signaux +  signaux[:,i,j]
+
+
+
+
+hrrc = signal_qpsk[2]
+symbols = signal_qpsk[3]
+hrrc_inv = np.flipud(hrrc)
+demod_convolv = signal.convolve(somme_signaux, hrrc_inv,mode='same')
+symbols_out_demod = demod_convolv[0::samples_per_symbol]
+
+angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
+angle_moyen = np.mean(angle_diff)
+symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
+
+plot_IQ_symbols(symbols_out_demod_egal, title="Constellation démodulée + egalisation de la somme des signaux") 
 
 
 
 
 
 
+
+
+
+'''
 ## Constelations d'un élément d'antenne
 
 hrrc = signal_qpsk[2]
@@ -267,7 +304,7 @@ symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
 plot_IQ_symbols(symbols_out_demod_egal, title="Constellation démodulée + egalisation d'un élément d'antenne") 
 
 
-
+'''
 
 
 
