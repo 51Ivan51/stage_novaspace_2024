@@ -28,8 +28,8 @@ t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
 N = 16              # Nombre d'éléments dans chaque dimension
 d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
-theta_deg = 20 
-phi_deg = 180 
+theta_deg = 34 
+phi_deg = 45
 
 theta = theta_deg*np.pi/180      
 phi = phi_deg*np.pi/180
@@ -211,7 +211,7 @@ else :
 
 
 
-
+'''
 # Application Dash
 
 app = Dash(__name__)
@@ -337,6 +337,6 @@ if __name__ == '__main__':
     app.run_server(port=8050, debug=True)
     webbrowser.open("http://127.0.0.1:8050/")
 
-
+'''
 
 

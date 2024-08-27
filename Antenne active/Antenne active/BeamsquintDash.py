@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug  8 14:16:39 2024
+Created on Tue Aug 27 09:37:39 2024
 
 @author: IvanB
 """
@@ -15,7 +15,8 @@ import math
 import plotly.graph_objects as go
 from dash import dcc, html, Input, Output, Dash
 import webbrowser
-
+import io
+import base64
 
 ## Paramètres 
 
@@ -28,7 +29,7 @@ f_tx = 20e9                                             # Fréquence d'échantil
 time = 0.0000002                                        # Durée du signal
 n_samples = round(fs*time)                              # Nombre d'échantillons
 cutoff_freq = 200                                       # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 16                                 # Nombre d'échantillons par symbole
+samples_per_symbol = 10                                 # Nombre d'échantillons par symbole
 c = 299792458                                           # Vitesse lumière dans le vide
 lambda0 = c / (f_tx)                                    # Longueur d'onde    
 t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
@@ -38,15 +39,17 @@ t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
 N = 20              # Nombre d'éléments dans chaque dimension
 d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
-dU = 0.5
-dV = 0.5
+theta_deg = 50
+phi_deg = 50 
 
-theta = np.arctan(np.sqrt((dU**2 + dV**2)))
-phi = np.arctan2(dU, dV) 
+theta = theta_deg*np.pi/180      
+phi = phi_deg*np.pi/180
 
-theta_deg = np.rad2deg(theta)
-phi_deg = np.rad2deg(phi)
-
+d_ts = 1200000
+dU = np.tan(theta)*d_ts*np.tan(phi)/np.cos(phi)
+dV = np.tan(theta)*d_ts/np.cos(phi)
+dU = 0
+dV = 0
 
 
 
@@ -148,7 +151,6 @@ fft_qpsk_offset = np.fft.fft(signal_in)
 
 
 
-
 ## Signal numérisé par l'ADC
 
 signal_out = ADC_QPSK_GLOBAL(signal_in)
@@ -160,39 +162,30 @@ fft_out = np.fft.fft(signal_out)
 ## Décalage de phase pour les différents éléments à un angle fixé
 
 X,Y = generate_positions(N,d)
+
 phases = calculate_phases(X, Y, theta, phi)
 phases_factor = np.exp(1j * phases)
 number_of_wrapping_phase = np.floor(phases/ (2*np.pi))
 max_wrapping = np.max(np.abs(number_of_wrapping_phase))
-
-signaux_phase = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
-
-for i in range(n_samples*samples_per_symbol):
-    signaux_phase[i, :, :] = signal_out[i]
-    signaux_phase[i, :, :] *= phases_factor
-
-
-
-## Décalage en temps pour les différents éléments à un angle fixé
 
 time_delay = calculate_time(phases)
 one_sample_time = time/len(t)
 number_of_sample_time = np.round(time_delay/one_sample_time)
 max_sample_time = int(np.max(np.abs(number_of_sample_time)))
 
-signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
-
+signaux = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
 for i in range(n_samples*samples_per_symbol):
-    signaux_time[i, :, :] = signal_out[i]
+    signaux[i, :, :] = signal_out[i]
+    signaux[i, :, :] *= phases_factor
+fft_phased = np.fft.fft(signaux[:,1,1])
 
-for x in range(N):
-    for y in range(N):
-        signaux_time[:, x, y] = np.roll(signaux_time[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
+
 
 
 
 
 ## GRD
+
 
 nbMappingSample = 201  
 thetaMax = 90  
@@ -219,17 +212,23 @@ circle_y = circle[:, 1]
 
 data = loadmat('GRD_INITIAL.mat')
 GRD_INIT = data['GRD_INIT']
+
 GRDS = np.zeros((N, N, 201, 201), dtype="complex")
+
 
 for i in range(N):  
     for j in range (N):
         dUV = np.exp(2 * np.pi / lambda0 * 1j * ( X[i,j] * U + Y[i,j] * V))
         GRDS[i,j,:,:] = GRD_INIT * dUV
 
+
 w = np.ones((N,N))
 w = w * np.exp(1j * 2 * np.pi * (-X*dU*35  + Y*dV*35 ))
 GRD_resultant = np.zeros((201, 201),dtype="complex")
 
+
+
+# Somme des contributions de GRDS
 for i in range(N):
     for j in range(N):
         GRD_resultant = GRD_resultant + GRDS[i,j,:,:] * w[i,j]
@@ -237,82 +236,23 @@ for i in range(N):
 GRD_resultant_abs =np.abs(GRD_resultant)
 GRD_resultant_db = 20 * np.log10(GRD_resultant_abs)
 
-plt.figure()
-x = np.linspace(-1, 1, 201)
-y = np.linspace(-1, 1, 201)
-plt.pcolor(x, y, GRD_resultant_db, shading='interp')
-plt.clim(7, 50)  
-plt.colorbar()   
-plt.plot(circle[:, 1], circle[:, 0], 'r', linewidth=3)
 
-plt.show()
 
+## Somme des signaux
 
 max_index = np.argmax(GRD_resultant_abs)
 k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
 
+for i in range(N):
+    for j in range(N):
+        signaux[:,i,j] = signaux[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
 
 
-
-
-
-## Somme des signaux en phase
+somme_signaux = np.zeros(n_samples*samples_per_symbol)
 
 for i in range(N):
     for j in range(N):
-        signaux_phase[:,i,j] = signaux_phase[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
-
-somme_signaux_phase = np.zeros(n_samples*samples_per_symbol)
-
-for i in range(N):
-    for j in range(N):
-        somme_signaux_phase = somme_signaux_phase +  signaux_phase[:,i,j]
-
-
-hrrc = signal_qpsk[2]
-symbols = signal_qpsk[3]
-hrrc_inv = np.flipud(hrrc)
-demod_convolv = signal.convolve(somme_signaux_phase, hrrc_inv,mode='same')
-symbols_out_demod = demod_convolv[0::samples_per_symbol]
-
-angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
-angle_moyen = np.mean(angle_diff)
-symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
-
-plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des signaux en phase") 
-
-
-
-
-
-## Somme des signaux en temps
-
-for i in range(N):
-    for j in range(N):
-        signaux_time[:,i,j] = signaux_time[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
-
-
-somme_signaux_time = np.zeros(len(signaux_time))
-
-for i in range(N):
-    for j in range(N):
-        somme_signaux_time = somme_signaux_time +  signaux_time[:,i,j]
-
-
-
-demod_convolv = signal.convolve(somme_signaux_time, hrrc_inv,mode='same')
-symbols_out_demod = demod_convolv[0::samples_per_symbol]
-
-zeros_to_add = len(symbols_out_demod)-len(symbols)
-symbols = np.concatenate((symbols, np.zeros(zeros_to_add)))
-
-angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
-angle_moyen = np.mean(angle_diff)
-symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
-
-plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des signaux en temps") 
-
-
+        somme_signaux = somme_signaux +  signaux[:,i,j]
 
 
 
@@ -323,27 +263,119 @@ plt.figure(figsize=(12, 8))
 freq = np.fft.fftfreq(n_samples*samples_per_symbol, 1/fs)
 
 
-plt.subplot(3, 1, 1)
+plt.subplot(4, 1, 1)
 plt.xlim(-fs/2-50,fs/2+50)
 plt.plot(freq, (1/fs)*np.abs(fft_qpsk))
 plt.title('FFT in')
 plt.xlabel('Fréquence (Hz)')
 plt.ylabel('Amplitude')
 
-plt.subplot(3, 1, 2)
+plt.subplot(4, 1, 2)
 plt.xlim(-fs/2-50,fs/2+50)
 plt.plot(freq, (1/fs)*np.abs(fft_qpsk_offset))
 plt.title('FFT in offset')
 plt.xlabel('Fréquence (Hz)')
 plt.ylabel('Amplitude')
 
-plt.subplot(3, 1, 3)
+plt.subplot(4, 1, 3)
 plt.xlim(-fs/2-50,fs/2+50)
 plt.plot(freq, (1/fs)*np.abs(fft_out))
 plt.title('FFT after ADC')
 plt.xlabel('Fréquence (Hz)')
 plt.ylabel('Amplitude')
 
+plt.subplot(4, 1, 4)
+plt.xlim(-fs/2-50,fs/2+50)
+plt.plot(freq, (1/fs)*np.abs(fft_phased))
+plt.title('FFT phased')
+plt.xlabel('Fréquence (Hz)')
+plt.ylabel('Amplitude')
+
+
 
 plt.tight_layout()
 plt.show()
+
+
+
+def create_plot(dU, dV, samples_per_symbol):
+    w = np.ones((N, N))
+    w = w * np.exp(1j * 2 * np.pi * (-X * dU * 35 + Y * dV * 35))
+    GRD_resultant = np.zeros((201, 201), dtype="complex")
+    for i in range(N):
+        for j in range(N):
+            GRD_resultant += GRDS[i, j, :, :] * w[i, j]
+
+    GRD_resultant_abs = np.abs(GRD_resultant)
+    GRD_resultant_db = 20 * np.log10(GRD_resultant_abs)
+
+    plt.figure()
+    x = np.linspace(-1, 1, 201)
+    y = np.linspace(-1, 1, 201)
+    plt.pcolor(x, y, GRD_resultant_db, shading='auto')
+    plt.clim(7, 50)  
+    plt.colorbar()   
+    plt.plot(circle[:, 1], circle[:, 0], 'r', linewidth=3)
+    plt.title('GRD Resultant')
+    plt.xlabel('U')
+    plt.ylabel('V')
+
+    # Sauvegarde la figure dans un buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close()
+    return buf
+
+
+
+
+
+# Application Dash
+app = Dash(__name__)
+
+app.layout = html.Div([
+    html.H1('Modélisation du Beamsquint', style={'textAlign': 'center'}),
+
+    html.Div(className='container', children=[
+        html.Div([
+            html.Img(id='grd-graph', style={'width': '100%', 'height': '800px'}),
+        ], className='graph-container'),
+
+        html.Div([
+            html.Label('dU'),
+            dcc.Slider(
+                id='du-slider',
+                min=-1, max=1, step=0.1, value=0,
+                className='dcc-slider'
+            ),
+            html.Label('dV'),
+            dcc.Slider(
+                id='dv-slider',
+                min=-1, max=1, step=0.1, value=0,
+                className='dcc-slider'
+            ),
+            html.Label('Samples per Symbol'),
+            dcc.Slider(
+                id='samples-slider',
+                min=1, max=50, step=1, value=10,
+                className='dcc-slider'
+            ),
+        ], className='control-panel')
+    ])
+])
+
+@app.callback(
+    Output('grd-graph', 'src'),
+    [Input('du-slider', 'value'),
+     Input('dv-slider', 'value'),
+     Input('samples-slider', 'value')]
+)
+def update_graph(dU, dV, samples_per_symbol):
+    buf = create_plot(dU, dV, samples_per_symbol)
+    encoded_image = base64.b64encode(buf.read()).decode('utf-8')
+    return "data:image/png;base64,{}".format(encoded_image)
+
+if __name__ == '__main__':
+    app.run_server(port=8050, debug=True)
+    webbrowser.open("http://127.0.0.1:8050/")
