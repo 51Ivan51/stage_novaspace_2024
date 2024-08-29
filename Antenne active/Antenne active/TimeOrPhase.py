@@ -186,10 +186,22 @@ if max_wrapping>0:
             signaux[:, x, y] = np.roll(signaux[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
             
     hrrc = signal_qpsk[2]
+    symbols = signal_qpsk[3]
     hrrc_inv = np.flipud(hrrc)
     demod_convolv = signal.convolve(signaux[:, 5, 5], hrrc_inv,mode='same')
     symbols_out_demod = demod_convolv[0::samples_per_symbol]
-    plot_IQ_symbols(symbols_out_demod, title="Constellation démodulée") 
+    
+    zeros_to_add = len(symbols_out_demod)-len(symbols)
+    symbols = np.concatenate((symbols, np.zeros(zeros_to_add)))
+    
+    angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
+    angle_moyen = np.mean(angle_diff)
+    symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
+    
+    plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des signaux en temps") 
+
+    
+    
     
 else :
     
