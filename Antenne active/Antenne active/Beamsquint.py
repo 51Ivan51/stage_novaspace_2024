@@ -261,6 +261,7 @@ k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
 ## Somme des signaux en phase
 
 
+
 signaux_phase_grd = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
 
 for i in range(n_samples*samples_per_symbol):
@@ -268,9 +269,7 @@ for i in range(n_samples*samples_per_symbol):
 
 for x in range(N):
     for y in range(N):
-        signaux_phase_grd[:, x, y] = np.roll(signaux_phase_grd[:, x, y],max_sample_time)
-
-
+        signaux_phase_grd[:, x, y] = np.roll(signaux_phase_grd[:, x, y],max_sample_time- int(number_of_sample_time[x,y]))
 
 
 
@@ -279,13 +278,15 @@ for x in range(N):
 
 for i in range(N):
     for j in range(N):
-        signaux_phase[:,i,j] = signaux_phase[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
+        signaux_phase_grd[:,i,j] = signaux_phase_grd[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
 
-somme_signaux_phase = np.zeros(n_samples*samples_per_symbol)
+
+somme_signaux_phase = np.zeros(len(signaux_phase_grd))
+
 
 for i in range(N):
     for j in range(N):
-        somme_signaux_phase = somme_signaux_phase +  signaux_phase[:,i,j]
+        somme_signaux_phase = somme_signaux_phase +  signaux_phase_grd[:,i,j]
 
 
 hrrc = signal_qpsk[2]
@@ -293,7 +294,8 @@ symbols = signal_qpsk[3]
 hrrc_inv = np.flipud(hrrc)
 demod_convolv = signal.convolve(somme_signaux_phase, hrrc_inv,mode='same')
 symbols_out_demod = demod_convolv[0::samples_per_symbol]
-
+zeros_to_add = len(symbols_out_demod)-len(symbols)
+symbols = np.concatenate((symbols, np.zeros(zeros_to_add)))
 angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
 angle_moyen = np.mean(angle_diff)
 symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
@@ -354,7 +356,6 @@ plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des sig
 
 
 
-'''
 ## Plot fft
 
 plt.figure(figsize=(12, 8))
@@ -385,4 +386,3 @@ plt.ylabel('Amplitude')
 
 plt.tight_layout()
 plt.show()
-'''
