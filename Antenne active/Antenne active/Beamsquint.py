@@ -28,7 +28,7 @@ f_tx = 20e9                                             # Fréquence d'échantil
 time = 0.0000002                                        # Durée du signal
 n_samples = round(fs*time)                              # Nombre d'échantillons
 cutoff_freq = 200                                       # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 10                                 # Nombre d'échantillons par symbole (30 - 60 - 90)
+samples_per_symbol = 30                                 # Nombre d'échantillons par symbole (30 - 60 - 90)
 c = 299792458                                           # Vitesse lumière dans le vide
 lambda0 = c / (f_tx)                                    # Longueur d'onde    
 t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
@@ -38,12 +38,12 @@ t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
 N = 20              # Nombre d'éléments dans chaque dimension
 d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
-dU = 0.2
-dV = 0.7
 
+#Steering
+dU = 0.1
+dV = -0.2
 theta = np.arctan(np.sqrt((dU**2 + dV**2)))
 phi = np.arctan2(dU, dV) 
-
 theta_deg = np.rad2deg(theta)
 phi_deg = np.rad2deg(phi)
 
@@ -175,22 +175,25 @@ for i in range(n_samples*samples_per_symbol):
 
 ## Décalage en temps pour les différents éléments à un angle fixé
 
-time_delay = calculate_time(phases)
-one_sample_time = time/len(t)
-number_of_sample_time = np.round(time_delay/one_sample_time)
-max_sample_time = int(np.max(np.abs(number_of_sample_time)))
-
-signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
-
-for i in range(n_samples*samples_per_symbol):
-    signaux_time[i, :, :] = signal_out[i]
-
-for x in range(N):
-    for y in range(N):
-        signaux_time[:, x, y] = np.roll(signaux_time[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
+    time_delay = calculate_time(phases)
+    one_sample_time = time/len(t)
+    number_of_sample_time = np.round(time_delay/one_sample_time)
+    max_sample_time = int(np.max(np.abs(number_of_sample_time)))
+    
+    signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
 
 
+def function_time_delay_njit():
 
+    for i in range(n_samples*samples_per_symbol):
+        signaux_time[i, :, :] = signal_out[i]
+    
+    for x in range(N):
+        for y in range(N):
+            signaux_time[:, x, y] = np.roll(signaux_time[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
+    
+
+function_time_delay_njit()
 
 ## GRD
 
