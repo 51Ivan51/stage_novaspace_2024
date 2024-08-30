@@ -23,8 +23,8 @@ import webbrowser
 Vpp = 2                                                 # Tension du DAC dans la boucle
 enob = 4                                                # Facteur de quantification
 upsampling = 64                                         # Facteur de suréchantillonnage
-fs = 60e9 
-f_tx = 20e9                                             # Fréquence d'échantillonnage (60GHz)
+fs = 60e9                                               # Fréquence d'échantillonnage (60GHz)
+f_tx = 20e9                                             
 time = 0.0000002                                        # Durée du signal
 n_samples = round(fs*time)                              # Nombre d'échantillons
 cutoff_freq = 200                                       # Fréquence de coupure du filtre pass-bas
@@ -40,7 +40,7 @@ d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
 
 #Steering
-dU = 0.1
+dU = 0.3
 dV = -0.2
 theta = np.arctan(np.sqrt((dU**2 + dV**2)))
 phi = np.arctan2(dU, dV) 
@@ -126,11 +126,11 @@ def calculate_phases(X, Y, theta, phi):
     phases = k * (X * np.sin(theta) * np.cos(phi) + Y * np.sin(theta) * np.sin(phi))
     return phases
 
+@njit
 def calculate_time(phases):
     k = 2 * np.pi / lambda0
     time_delay = 5*phases /(np.pi*fs)
     return time_delay
-
 
 
 
@@ -175,12 +175,12 @@ for i in range(n_samples*samples_per_symbol):
 
 ## Décalage en temps pour les différents éléments à un angle fixé
 
-    time_delay = calculate_time(phases)
-    one_sample_time = time/len(t)
-    number_of_sample_time = np.round(time_delay/one_sample_time)
-    max_sample_time = int(np.max(np.abs(number_of_sample_time)))
-    
-    signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
+time_delay = calculate_time(phases)
+one_sample_time = time/len(t)
+number_of_sample_time = np.round(time_delay/one_sample_time)
+max_sample_time = int(np.max(np.abs(number_of_sample_time)))
+
+signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
 
 
 def function_time_delay_njit():
@@ -265,17 +265,21 @@ k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
 
 
 
-signaux_phase_grd = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
-
-for i in range(n_samples*samples_per_symbol):
-    signaux_phase_grd[i, :, :] = signaux_phase[i]
-
-for x in range(N):
-    for y in range(N):
-        signaux_phase_grd[:, x, y] = np.roll(signaux_phase_grd[:, x, y],max_sample_time- int(number_of_sample_time[x,y]))
+signaux_phase_grd = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
 
 
 
+def calculate_delay(signal):
+    
+    for i in range(N):
+        for j in range(N):
+            for x in range(n_samples*samples_per_symbol):
+                signal[x,i,j] = signal[x,i,j]*np.exp(-1j*2*np.pi*x*number_of_sample_time[i,j]*f_tx*one_sample_time)
+                
+    return signal
+
+
+signaux_phase_grd = calculate_delay(signaux_phase)
 
 
 
