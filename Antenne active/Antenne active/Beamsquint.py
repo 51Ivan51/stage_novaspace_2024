@@ -13,25 +13,24 @@ import webbrowser
 from usual import *  
 import math
 import plotly.graph_objects as go
-from dash import dcc, html, Input, Output, Dash
-import webbrowser
+import time
 
 
 ## Paramètres 
 
 #ADC
-Vpp = 2                                                 # Tension du DAC dans la boucle
-enob = 4                                                # Facteur de quantification
-upsampling = 64                                         # Facteur de suréchantillonnage
-fs = 60e9                                               # Fréquence d'échantillonnage (60GHz)
+Vpp = 2                                                      # Tension du DAC dans la boucle
+enob = 4                                                     # Facteur de quantification
+upsampling = 64                                              # Facteur de suréchantillonnage
+fs = 60e9                                                    # Fréquence d'échantillonnage (60GHz)
 f_tx = 20e9                                             
-time = 0.0000002                                        # Durée du signal
-n_samples = round(fs*time)                              # Nombre d'échantillons
-cutoff_freq = 200                                       # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 30                                 # Nombre d'échantillons par symbole (30 - 60 - 90)
-c = 299792458                                           # Vitesse lumière dans le vide
-lambda0 = c / (f_tx)                                    # Longueur d'onde    
-t = np.linspace(0, time, n_samples*samples_per_symbol)  # Vecteur temps
+time_s =  0.0000002                                               # Durée du signal
+n_samples = round(fs*time_s)                                 # Nombre d'échantillons
+cutoff_freq = 200                                            # Fréquence de coupure du filtre pass-bas
+samples_per_symbol = 30                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
+c = 299792458                                                # Vitesse lumière dans le vide
+lambda0 = c / (f_tx)                                         # Longueur d'onde    
+t = np.linspace(0, time_s, n_samples*samples_per_symbol)     # Vecteur temps
 
 
 #Antenne
@@ -40,13 +39,12 @@ d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
 
 #Steering
-dU = 0.3
-dV = -0.2
+dU = 0.1
+dV = 0
 theta = np.arctan(np.sqrt((dU**2 + dV**2)))
 phi = np.arctan2(dU, dV) 
 theta_deg = np.rad2deg(theta)
 phi_deg = np.rad2deg(phi)
-
 
 
 
@@ -135,7 +133,12 @@ def calculate_time(phases):
 
 
 
-## Signal de base recu
+
+
+## 1- Signal de base recu
+print("Etape 1 : Création du signal... ")
+start_time = time.time()
+
 
 noise = create_awgn(n_samples*samples_per_symbol, bandwidth=0.1)
 signal_qpsk = qpsk(n_samples,0.2,samples_per_symbol)
@@ -146,18 +149,34 @@ fft_qpsk = np.fft.fft(signal_qpsk_conv_noise)
 signal_in = frequency_offset(signal_qpsk_conv_noise,fs/10,fs) 
 fft_qpsk_offset = np.fft.fft(signal_in)
 
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 1 : completed in {execution_time:.4f} seconds!")
 
 
 
-## Signal numérisé par l'ADC
+
+
+
+## 2- Signal numérisé par l'ADC
+print("Etape 2 : Numérisation du signal par l'ADC... ")
+start_time = time.time()
 
 signal_out = ADC_QPSK_GLOBAL(signal_in)
 fft_out = np.fft.fft(signal_out)
 
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 2 : completed in {execution_time:.4f} seconds!")
 
 
 
-## Décalage de phase pour les différents éléments à un angle fixé
+
+
+
+## 3- Décalage de phase pour les différents éléments à un angle fixé
+print("Etape 3 : Décalage des signaux en phase... ")
+start_time = time.time()
 
 X,Y = generate_positions(N,d)
 phases = calculate_phases(X, Y, theta, phi)
@@ -171,31 +190,52 @@ for i in range(n_samples*samples_per_symbol):
     signaux_phase[i, :, :] = signal_out[i]
     signaux_phase[i, :, :] *= phases_factor
 
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 3 : completed in {execution_time:.4f} seconds!")
 
 
-## Décalage en temps pour les différents éléments à un angle fixé
+
+
+
+
+
+
+## 4- Décalage en temps pour les différents éléments à un angle fixé
+print("Etape 4 : Décalage des signaux en temps... ")
+start_time = time.time()
+
 
 time_delay = calculate_time(phases)
-one_sample_time = time/len(t)
+one_sample_time = time_s/len(t)
 number_of_sample_time = np.round(time_delay/one_sample_time)
 max_sample_time = int(np.max(np.abs(number_of_sample_time)))
 
 signaux_time = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
 
 
-def function_time_delay_njit():
+for i in range(n_samples*samples_per_symbol):
+    signaux_time[i, :, :] = signal_out[i]
 
-    for i in range(n_samples*samples_per_symbol):
-        signaux_time[i, :, :] = signal_out[i]
-    
-    for x in range(N):
-        for y in range(N):
-            signaux_time[:, x, y] = np.roll(signaux_time[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
-    
+for x in range(N):
+    for y in range(N):
+        signaux_time[:, x, y] = np.roll(signaux_time[:, x, y],max_sample_time + int(number_of_sample_time[x,y]))
 
-function_time_delay_njit()
 
-## GRD
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 4 : completed in {execution_time:.4f} seconds!")
+
+
+
+
+
+
+
+
+## 5- GRD
+print("Etape 5 : Calcul du GRD... ")
+start_time = time.time()
 
 nbMappingSample = 201  
 thetaMax = 90  
@@ -254,6 +294,9 @@ plt.show()
 max_index = np.argmax(GRD_resultant_abs)
 k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
 
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 5 : completed in {execution_time:.4f} seconds!")
 
 
 
@@ -261,25 +304,19 @@ k, l = np.unravel_index(max_index, GRD_resultant_abs.shape)
 
 
 
-## Somme des signaux en phase
-
-
+## 6- Somme des signaux en phase
+print("Etape 6 : Somme des signaux en phase... ")
+start_time = time.time()
 
 signaux_phase_grd = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
+fft_signaux_phase = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
+f = np.fft.fftfreq(n_samples*samples_per_symbol, d=1/fs)
 
 
-
-def calculate_delay(signal):
-    
-    for i in range(N):
-        for j in range(N):
-            for x in range(n_samples*samples_per_symbol):
-                signal[x,i,j] = signal[x,i,j]*np.exp(-1j*2*np.pi*x*number_of_sample_time[i,j]*f_tx*one_sample_time)
-                
-    return signal
-
-
-signaux_phase_grd = calculate_delay(signaux_phase)
+for i in range(N):
+    for j in range(N):
+        fft_signaux_phase[:,i,j] = np.fft.fft(signaux_phase[:,i,j])*np.exp(-1j*2*f*np.pi*time_delay[i,j])
+        signaux_phase_grd[:,i,j] = np.fft.ifft(fft_signaux_phase[:,i,j])
 
 
 
@@ -301,8 +338,7 @@ symbols = signal_qpsk[3]
 hrrc_inv = np.flipud(hrrc)
 demod_convolv = signal.convolve(somme_signaux_phase, hrrc_inv,mode='same')
 symbols_out_demod = demod_convolv[0::samples_per_symbol]
-zeros_to_add = len(symbols_out_demod)-len(symbols)
-symbols = np.concatenate((symbols, np.zeros(zeros_to_add)))
+
 angle_diff = np.angle(symbols_out_demod * np.conj(symbols))
 angle_moyen = np.mean(angle_diff)
 symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
@@ -310,16 +346,18 @@ symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
 plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des signaux en phase") 
 
 
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 6 : completed in {execution_time:.4f} seconds!")
 
 
 
 
 
 
-
-## Somme des signaux en temps
-
-
+## 7- Somme des signaux en temps
+print("Etape 7 : Somme des signaux en temps... ")
+start_time = time.time()
 
 
 signaux_time_grd = np.zeros((n_samples*samples_per_symbol + 2*max_sample_time, N, N), dtype=complex)
@@ -332,19 +370,17 @@ signaux_time_grd_trimmed = signaux_time_grd[:n_samples*samples_per_symbol, :, :]
 
 
 
-
-
-
 for i in range(N):
     for j in range(N):
         signaux_time_grd_trimmed[:,i,j] = signaux_time_grd_trimmed[:,i,j]*np.abs(w[i,j])*GRDS[i,j,k,l]
-
-
+        
 somme_signaux_time = np.zeros(len(signaux_time_grd_trimmed))
 
 for i in range(N):
     for j in range(N):
-        somme_signaux_time = somme_signaux_time +  signaux_time_grd_trimmed[:,i,j]
+        somme_signaux_time = somme_signaux_time + signaux_time_grd_trimmed[:,i,j]
+        
+
 
 
 hrrc = signal_qpsk[2]
@@ -358,6 +394,14 @@ angle_moyen = np.mean(angle_diff)
 symbols_out_demod_egal = symbols_out_demod * np.exp(-1j * angle_moyen)
 
 plot_IQ_symbols(symbols_out_demod_egal, title="Constellation de la somme des signaux en temps") 
+
+
+end_time = time.time()
+execution_time = end_time - start_time
+print(f"Etape 7 : completed in {execution_time:.4f} seconds!")
+
+
+
 
 
 
