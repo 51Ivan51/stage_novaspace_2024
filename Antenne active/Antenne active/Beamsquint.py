@@ -23,11 +23,11 @@ Vpp = 2                                                      # Tension du DAC da
 enob = 4                                                     # Facteur de quantification
 upsampling = 64                                              # Facteur de suréchantillonnage
 fs = 60e9                                                    # Fréquence d'échantillonnage (60GHz)
-f_tx = 20e9                                             
-time_s =  0.0000002                                               # Durée du signal
+f_tx = 20e9                                                  # Fréquence porteuse
+time_s =  0.00000002                                          # Durée du signal
 n_samples = round(fs*time_s)                                 # Nombre d'échantillons
 cutoff_freq = 200                                            # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 30                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
+samples_per_symbol = 60                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
 c = 299792458                                                # Vitesse lumière dans le vide
 lambda0 = c / (f_tx)                                         # Longueur d'onde    
 t = np.linspace(0, time_s, n_samples*samples_per_symbol)     # Vecteur temps
@@ -127,7 +127,7 @@ def calculate_phases(X, Y, theta, phi):
 @njit
 def calculate_time(phases):
     k = 2 * np.pi / lambda0
-    time_delay = 5*phases /(np.pi*fs)
+    time_delay = phases / (k*c)
     return time_delay
 
 
@@ -146,7 +146,7 @@ signal_qpsk_conv = signal_qpsk[0]
 signal_qpsk_conv_noise = signal_qpsk_conv + noise
 fft_qpsk = np.fft.fft(signal_qpsk_conv_noise)
 
-signal_in = frequency_offset(signal_qpsk_conv_noise,fs/10,fs) 
+signal_in = frequency_offset(signal_qpsk_conv_noise,f_tx,fs) 
 fft_qpsk_offset = np.fft.fft(signal_in)
 
 end_time = time.time()
@@ -181,7 +181,7 @@ start_time = time.time()
 X,Y = generate_positions(N,d)
 phases = calculate_phases(X, Y, theta, phi)
 phases_factor = np.exp(1j * phases)
-number_of_wrapping_phase = np.floor(phases/ (2*np.pi))
+number_of_wrapping_phase = np.floor(phases / (2*np.pi))
 max_wrapping = np.max(np.abs(number_of_wrapping_phase))
 
 signaux_phase = np.zeros((n_samples*samples_per_symbol, N, N), dtype=complex)
@@ -207,7 +207,7 @@ start_time = time.time()
 
 
 time_delay = calculate_time(phases)
-one_sample_time = time_s/len(t)
+one_sample_time = 1/fs
 number_of_sample_time = np.round(time_delay/one_sample_time)
 max_sample_time = int(np.max(np.abs(number_of_sample_time)))
 
@@ -315,7 +315,7 @@ f = np.fft.fftfreq(n_samples*samples_per_symbol, d=1/fs)
 
 for i in range(N):
     for j in range(N):
-        fft_signaux_phase[:,i,j] = np.fft.fft(signaux_phase[:,i,j])*np.exp(-1j*2*f*np.pi*time_delay[i,j])
+        fft_signaux_phase[:,i,j] = np.fft.fft(signaux_phase[:,i,j])*np.exp(-2j * np.pi * f * one_sample_time * number_of_sample_time[i,j])
         signaux_phase_grd[:,i,j] = np.fft.ifft(fft_signaux_phase[:,i,j])
 
 
@@ -437,3 +437,29 @@ plt.ylabel('Amplitude')
 
 plt.tight_layout()
 plt.show()
+
+
+
+
+
+a_normal = signaux_phase[:,i,j]
+a_decale = np.fft.ifft(fft_signaux_phase[:,i,j])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
