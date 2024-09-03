@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Thu Aug  4 16:02:06 2024
+
+@author: IvanB
+"""
 
 import numpy as np
 import plotly.graph_objects as go
