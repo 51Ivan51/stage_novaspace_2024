@@ -27,7 +27,7 @@ f_tx = 20e9                                                  # Fréquence porteu
 time_s =  0.00000002                                         # Durée du signal
 n_samples = round(fs*time_s)                                 # Nombre d'échantillons
 cutoff_freq = 200                                            # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 90                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
+samples_per_symbol = 64                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
 c = 299792458                                                # Vitesse lumière dans le vide
 lambda0 = c / (f_tx)                                         # Longueur d'onde    
 t = np.linspace(0, time_s, n_samples*samples_per_symbol)     # Vecteur temps
@@ -37,8 +37,8 @@ N = 20              # Nombre d'éléments dans chaque dimension
 d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
 #Steering
-dU = 0.3
-dV = -0.5
+dU = 0.5
+dV = 0
 theta = np.arctan(np.sqrt((dU**2 + dV**2)))
 phi = np.arctan2(dU, dV) 
 theta_deg = np.rad2deg(theta)
