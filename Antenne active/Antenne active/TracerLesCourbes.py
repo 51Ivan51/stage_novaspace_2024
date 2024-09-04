@@ -23,26 +23,6 @@ import time
 
 
 
-## Paramètres 
-
-#ADC
-Vpp = 2                                                      # Tension du DAC dans la boucle
-enob = 4                                                     # Facteur de quantification
-upsampling = 64                                              # Facteur de suréchantillonnage
-fs = 60e9                                                    # Fréquence d'échantillonnage (60GHz)
-f_tx = 20e9                                                  # Fréquence porteuse
-time_s =  0.00000002                                         # Durée du signal
-n_samples = round(fs*time_s)                                 # Nombre d'échantillons
-cutoff_freq = 200                                            # Fréquence de coupure du filtre pass-bas
-samples_per_symbol = 64                                      # Nombre d'échantillons par symbole (30 - 60 - 90)
-c = 299792458                                                # Vitesse lumière dans le vide
-lambda0 = c / (f_tx)                                         # Longueur d'onde    
-t = np.linspace(0, time_s, n_samples*samples_per_symbol)     # Vecteur temps
-
-#Antenne
-N = 20              # Nombre d'éléments dans chaque dimension
-d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
-
 
 
 
@@ -125,41 +105,62 @@ def calculate_time(phases):
 
 
 
-## 1- Signal de base recu
-
-noise = create_awgn(n_samples*samples_per_symbol, bandwidth=0.1)
-signal_qpsk = qpsk(n_samples,0.2,samples_per_symbol)
-signal_qpsk_conv = signal_qpsk[0]
-signal_qpsk_conv_noise = signal_qpsk_conv + noise
-fft_qpsk = np.fft.fft(signal_qpsk_conv_noise)
-
-signal_in = frequency_offset(signal_qpsk_conv_noise,f_tx,fs) 
-fft_qpsk_offset = np.fft.fft(signal_in)
-
-
-
-
-
-## 2- Signal numérisé par l'ADC
-
-signal_out = ADC_QPSK_GLOBAL(signal_in)
-fft_out = np.fft.fft(signal_out)
-
-
-
-SNR_phase = np.zeros(11)
-SNR_time = np.zeros(11)
-
-
-
-for du in np.arange(0, 1.1, 0.1): 
     
-    dU = -du
-    dV = du
+vecteur = np.arange(10, 111, 10)
+SNR_phase = np.zeros(len(vecteur))
+SNR_time = np.zeros(len(vecteur))
+
+
+
+
+for indice, sps in enumerate(vecteur):
+    
+    ## Paramètres 
+    #ADC
+    Vpp = 2                                                      # Tension du DAC dans la boucle
+    enob = 4                                                     # Facteur de quantification
+    upsampling = 64                                              # Facteur de suréchantillonnage
+    fs = 60e9                                                    # Fréquence d'échantillonnage (60GHz)
+    f_tx = 20e9                                                  # Fréquence porteuse
+    time_s =  0.00000002                                         # Durée du signal
+    n_samples = round(fs*time_s)                                 # Nombre d'échantillons
+    cutoff_freq = 200                                            # Fréquence de coupure du filtre pass-bas
+    samples_per_symbol = sps                                     # Nombre d'échantillons par symbole (30 - 60 - 90)
+    c = 299792458                                                # Vitesse lumière dans le vide
+    lambda0 = c / (f_tx)                                         # Longueur d'onde    
+    t = np.linspace(0, time_s, n_samples*samples_per_symbol)     # Vecteur temps
+    
+    #Antenne
+    N = 20              # Nombre d'éléments dans chaque dimension
+    d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
+    
+    #Steering
+    dU = -0.6
+    dV = -0.3
     theta = np.arctan(np.sqrt((dU**2 + dV**2)))
     phi = np.arctan2(dU, dV) 
     theta_deg = np.rad2deg(theta)
     phi_deg = np.rad2deg(phi)
+    
+    
+    
+    ## 1- Signal de base recu
+    
+    noise = create_awgn(n_samples*samples_per_symbol, bandwidth=0.1)
+    signal_qpsk = qpsk(n_samples,0.2,samples_per_symbol)
+    signal_qpsk_conv = signal_qpsk[0]
+    signal_qpsk_conv_noise = signal_qpsk_conv + noise
+    fft_qpsk = np.fft.fft(signal_qpsk_conv_noise)
+    
+    signal_in = frequency_offset(signal_qpsk_conv_noise,f_tx,fs) 
+    fft_qpsk_offset = np.fft.fft(signal_in)
+    
+    
+    
+    ## 2- Signal numérisé par l'ADC
+    
+    signal_out = ADC_QPSK_GLOBAL(signal_in)
+    fft_out = np.fft.fft(signal_out)
     
 
     
@@ -320,23 +321,19 @@ for du in np.arange(0, 1.1, 0.1):
 
 
 
-    SNR_phase[int(du*10)] = M2M4(symbols_out_demod_egal_phase,1)
-    SNR_time[int(du*10)] = M2M4(symbols_out_demod_egal_time,1)
+    SNR_phase[indice] = M2M4(symbols_out_demod_egal_phase,1)
+    SNR_time[indice] = M2M4(symbols_out_demod_egal_time,1)
 
-    print(f'{du} done')
-
-
-x1 = np.array([0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1])
-x2 = np.array([0,-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1])
+    print(f'{sps} done')
 
 
-plt.plot(x2, SNR_phase, label='SNR phase', color='blue')
-plt.plot(x2, SNR_time, label='SNR time', color='red')
 
-plt.gca().invert_xaxis()
 
-plt.title('SNR en fonction de dU et dV')
-plt.xlabel('dU=-dV')
+
+plt.plot(vecteur, SNR_phase, label='SNR phase', color='blue')
+plt.plot(vecteur, SNR_time, label='SNR time', color='red')
+plt.title('SNR en fonction de samples_per_symbol')
+plt.xlabel('Samples_per_symbol')
 plt.ylabel('SNR')
 plt.legend()
 plt.show()

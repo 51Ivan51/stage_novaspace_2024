@@ -37,8 +37,8 @@ N = 20              # Nombre d'éléments dans chaque dimension
 d = 0.5 * lambda0   # Espacement entre les éléments en longueur d'onde
 
 #Steering
-dU = 0.5
-dV = 0
+dU = -0.6
+dV = -0.3
 theta = np.arctan(np.sqrt((dU**2 + dV**2)))
 phi = np.arctan2(dU, dV) 
 theta_deg = np.rad2deg(theta)
