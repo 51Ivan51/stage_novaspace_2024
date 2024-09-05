@@ -1,6 +1,3 @@
-Stage d'été 2024 chez Novaspace.
-Ivan Bourlatchka et Nicolas Jacquey.
-
 # Rapport de Stage
 
 ## Description
@@ -19,7 +16,7 @@ Ce dépôt comprend tous les codes et son rapport de stage associé effectué ch
 
 ## Auteurs
 
-- **Bourlatchka** - Auteur principal
+- **Bourlatchka Ivan** - Auteur principal
 - **Nicolas Jacquey** - Tuteur de stage
 - **Entreprise** - [Novaspace]((https://nova.space/))
 
