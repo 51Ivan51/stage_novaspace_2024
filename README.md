@@ -18,5 +18,5 @@ Ce dépôt comprend tous les codes et son rapport de stage associé effectué ch
 
 - **Bourlatchka Ivan** - Auteur principal
 - **Nicolas Jacquey** - Tuteur de stage
-- **Entreprise** - [Novaspace]((https://nova.space/))
+- **Entreprise** - [Novaspace](https://nova.space/)
 
